@@ -31,7 +31,7 @@ class _EditVendorState extends State<EditVendor> {
   void initState() {
     var vendorBloc = Provider.of<VendorBloc>(context, listen: false);
     _savedSubscription = vendorBloc.vendorSaved.listen((saved) {
-      if (saved != null && saved == true && context != null) {
+      if (saved == true) {
         Fluttertoast.showToast(
             msg: "Vendor Saved",
             toastLength: Toast.LENGTH_SHORT,

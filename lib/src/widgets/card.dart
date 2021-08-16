@@ -43,7 +43,7 @@ class AppCard extends StatelessWidget {
               Padding(
                 padding:
                     const EdgeInsets.only(right: 10.0, bottom: 10.0, top: 10.0),
-                child: (imageUrl != null && imageUrl != "")
+                child: (imageUrl != "")
                     ? ClipRRect(
                         child: Image.network(
                           imageUrl,

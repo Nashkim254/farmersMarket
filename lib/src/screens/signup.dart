@@ -27,7 +27,7 @@ class _SignupState extends State<Signup> {
   void initState() {
     final authBloc = Provider.of<AuthBloc>(context, listen: false);
     _userSubscription = authBloc.user.listen((user) {
-      if (user != null) Navigator.pushReplacementNamed(context, '/landing');
+      Navigator.pushReplacementNamed(context, '/landing');
     });
 
     _errorMessageSubscription = authBloc.errorMessage.listen((errorMessage) {
