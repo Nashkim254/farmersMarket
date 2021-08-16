@@ -1,0 +1,93 @@
+import 'package:farmersmarket/src/blocs/auth_bloc.dart';
+import 'package:farmersmarket/src/blocs/customer_bloc.dart';
+import 'package:farmersmarket/src/blocs/product_bloc.dart';
+import 'package:farmersmarket/src/routes.dart';
+import 'package:farmersmarket/src/screens/landing.dart';
+import 'package:farmersmarket/src/screens/login.dart';
+import 'package:farmersmarket/src/services/firestore_service.dart';
+import 'package:farmersmarket/src/styles/colors.dart';
+import 'package:farmersmarket/src/styles/text.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
+
+import 'package:provider/provider.dart';
+
+import 'blocs/vendor_bloc.dart';
+
+final authBloc = AuthBloc();
+final productBloc = ProductBloc();
+final customerBloc = CustomerBloc();
+final vendorBloc = VendorBloc();
+final firestoreService = FirestoreService();
+
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(providers: [
+      Provider(create: (context) => authBloc),
+      Provider(create: (context) => productBloc),
+      Provider(
+        create: (context) => customerBloc,
+      ),
+      Provider(
+        create: (context) => vendorBloc,
+      ),
+      FutureProvider(
+        create: (context) => authBloc.isLoggedIn(),
+        initialData: "fetching...",
+      ),
+      StreamProvider(
+        create: (context) => firestoreService.fetchUnitTypes(),
+        initialData: "fetching types.....",
+      )
+    ], child: PlatformApp());
+  }
+
+  @override
+  void dispose() {
+    authBloc.dispose();
+    productBloc.dispose();
+    customerBloc.dispose();
+    vendorBloc.dispose();
+    super.dispose();
+  }
+}
+
+class PlatformApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var isLoggedIn = Provider.of<bool>(context);
+
+    if (Platform.isIOS) {
+      return CupertinoApp(
+          home: (isLoggedIn == true) ? Landing() : Login(),
+          onGenerateRoute: Routes.cupertinoRoutes,
+          theme: CupertinoThemeData(
+              primaryColor: AppColors.straw,
+              scaffoldBackgroundColor: Colors.white,
+              textTheme: CupertinoTextThemeData(
+                  tabLabelTextStyle: TextStyles.suggestion)));
+    } else {
+      return MaterialApp(
+          home: (isLoggedIn == true) ? Landing() : Login(),
+          onGenerateRoute: Routes.materialRoutes,
+          theme: ThemeData(scaffoldBackgroundColor: Colors.white));
+    }
+  }
+
+  Widget loadingScreen(bool isIOS) {
+    return (isIOS)
+        ? CupertinoPageScaffold(
+            child: Center(
+              child: CupertinoActivityIndicator(),
+            ),
+          )
+        : Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+}
